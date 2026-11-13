@@ -167,16 +167,11 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:8px}
     <button class="tab" role="tab" id="tab-legend" aria-selected="false" aria-controls="p-legend">أسطورة الشهر</button>
   </div>
 
-  <div class="admin-bar admin-only">
-    <b>وضع الإدارة:</b> عدّلي القائمة والبطاقة هنا، وبعدين اضغطي «تجهيز ملف الموقع» وارفعي ملف <b>data.json</b> مع الموقع عشان تظهر التعديلات للكل.
-  </div>
-
   <section class="panel" id="p-members" role="tabpanel">
     <div class="board" id="board">
       <div class="toolbar">
         <span class="note" id="mstatus"></span>
         <div class="grp admin-only">
-          <button class="btn sm" id="publishBtn" type="button">تجهيز ملف الموقع</button>
           <button class="btn ghost sm" id="exportBtn" type="button">حفظ نسخة احتياطية</button>
           <label class="btn ghost sm" for="importFile" style="display:inline-flex;align-items:center">استرجاع نسخة</label>
           <input type="file" id="importFile" accept="application/json,.json" hidden>
@@ -246,8 +241,8 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:8px}
   let state = { members: [], legend: {} };
   let editing = false;
 
-  // Admin = opened from the computer (file://) or with ?edit in the address
-  const ADMIN = location.protocol==='file:' || new URLSearchParams(location.search).has('edit');
+  // Single-owner site: editing is always on, data lives in this browser
+  const ADMIN = true;
   document.body.classList.toggle('admin', ADMIN);
   const valid = s => s && Array.isArray(s.members);
   function readLocal(){ try{ const s=JSON.parse(localStorage.getItem(KEY)); return valid(s)?s:null; }catch(e){ return null; } }
@@ -323,13 +318,6 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin-top:8px}
     $('#newName').value=''; $('#newName').focus();
   });
 
-  // Site data file: upload it next to index.html so visitors see the latest list
-  $('#publishBtn').onclick=()=>{
-    const blob=new Blob([JSON.stringify(state)],{type:'application/json'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='data.json'; a.click();
-    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
-    $('#mstatus').textContent='تم تجهيز data.json ✓ ارفعيه مع الموقع.';
-  };
   $('#viewDl').onclick=()=>$('#dlCard').click();
   // Backup
   $('#exportBtn').onclick=()=>{
